@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiyat Teklifi</title>
+    <style>
+        /* DOMPDF Uyumlu CSS - Flex, Grid, Position Absolute Kullanılmamıştır */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            background: #fff;
+            counter-reset: page;
+        }
+        
+        /* Sayfa Yapısı */
+        .page {
+            width: 100%;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20mm;
+            min-height: 297mm;
+        }
+        
+        /* Header - Sabit Pozisyon */
+        .header {
+            position: fixed;
+            top: 10mm;
+            left: 20mm;
+            right: 20mm;
+            height: 25mm;
+            border-bottom: 2px solid #374151;
+            padding-bottom: 5mm;
+        }
+        
+        .header-content {
+            width: 100%;
+            table-layout: fixed;
+        }
+        
+        .logo-section {
+            width: 40%;
+            vertical-align: top;
+        }
+        
+        .company-info {
+            width: 60%;
+            text-align: right;
+            vertical-align: top;
+        }
+        
+        .logo-placeholder {
+            width: 120px;
+            height: 40px;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            text-align: center;
+            line-height: 40px;
+            font-size: 10px;
+            color: #6b7280;
+            border-radius: 4px;
+        }
+        
+        .company-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 2px;
+        }
+        
+        .company-details {
+            font-size: 10px;
+            color: #6b7280;
+            line-height: 1.3;
+        }
+        
+        /* Footer - Sabit Pozisyon */
+        .footer {
+            position: fixed;
+            bottom: 10mm;
+            left: 20mm;
+            right: 20mm;
+            height: 15mm;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 3mm;
+            font-size: 10px;
+            color: #6b7280;
+            text-align: center;
+        }
+        
+        /* Ana İçerik */
+        .content {
+            margin-top: 35mm;
+            margin-bottom: 20mm;
+        }
+        
+        /* Teklif Başlığı */
+        .quote-title {
+            text-align: center;
+            margin-bottom: 8mm;
+        }
+        
+        .quote-title h1 {
+            font-size: 24px;
+            color: #1f2937;
+            font-weight: bold;
+            margin-bottom: 2mm;
+        }
+        
+        .quote-subtitle {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        /* Teklif Bilgileri Formu */
+        .quote-info {
+            margin-bottom: 8mm;
+        }
+        
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 5mm;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .info-row {
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .info-label {
+            width: 25%;
+            padding: 3mm 2mm;
+            font-weight: bold;
+            color: #374151;
+            background: #f9fafb;
+            border-right: 1px solid #e5e7eb;
+        }
+        
+        .info-value {
+            width: 25%;
+            padding: 3mm 2mm;
+            border-right: 1px solid #e5e7eb;
+        }
+        
+        /* Ürünler Tablosu */
+        .products-section {
+            margin-top: 8mm;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 4mm;
+            padding-bottom: 2mm;
+            border-bottom: 2px solid #374151;
+        }
+        
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 5mm;
+            border-radius: 6px;
+            overflow: hidden;
+            /* Sayfa taşması kontrolü */
+            table-layout: fixed;
+        }
+        
+        .products-table th {
+            background: #374151;
+            color: white;
+            padding: 3mm 2mm;
+            text-align: left;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        
+        .products-table td {
+            padding: 3mm 2mm;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+        
+        .products-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        .product-image {
+            width: 40px;
+            height: 40px;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            text-align: center;
+            line-height: 40px;
+            font-size: 8px;
+            color: #9ca3af;
+            border-radius: 4px;
+        }
+        
+        .product-code {
+            font-weight: bold;
+            color: #374151;
+        }
+        
+        .product-name {
+            font-weight: bold;
+            margin-bottom: 1mm;
+        }
+        
+        .product-description {
+            font-size: 10px;
+            color: #6b7280;
+            page-break-inside: avoid;
+            orphans: 2;
+            widows: 2;
+        }
+        
+        .price {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .quantity {
+            text-align: center;
+        }
+        
+        .subtotal {
+            text-align: right;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        /* Toplam Hesaplama */
+        .totals-section {
+            margin-top: 5mm;
+            width: 100%;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        
+        .totals-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+        }
+        
+        .totals-table td {
+            padding: 2mm 3mm;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .totals-label {
+            text-align: right;
+            font-weight: bold;
+            width: 60%;
+        }
+        
+        .totals-value {
+            text-align: right;
+            width: 40%;
+        }
+        
+        .grand-total {
+            background: #374151;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        /* Notlar ve Şartlar */
+        .notes-section {
+            margin-top: 5mm;
+            padding: 4mm;
+            background: #f9fafb;
+            border-left: 4px solid #374151;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+        
+        .notes-title {
+            font-weight: bold;
+            margin-bottom: 2mm;
+            color: #1f2937;
+        }
+        
+        .notes-content {
+            font-size: 10px;
+            line-height: 1.5;
+            color: #4b5563;
+        }
+        
+        /* Sayfa Numarası */
+        .page-number {
+            position: fixed;
+            bottom: 5mm;
+            right: 20mm;
+            font-size: 10px;
+            color: #9ca3af;
+        }
+
+        /* Sayfa numaralandırması için counter */
+
+        .page-number::before {
+            counter-increment: page;
+            content: "Sayfa " counter(page);
+        }
+
+        /* Sayfa Geçişi Kontrolleri */
+        @page {
+            margin: 20mm;
+            size: A4;
+        }
+
+        /* Tablo satırlarının sayfa geçişinde bölünmesini engelle */
+        .products-table tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        /* Ürün bölümünün başlığının yalnız kalmasını engelle */
+        .section-title {
+            page-break-after: avoid;
+        }
+
+        /* Sayfa sonunda az yer kaldığında yeni sayfaya geç */
+        .products-table tbody tr {
+            page-break-inside: avoid;
+            orphans: 2;
+            widows: 2;
+        }
+
+        /* Header ve Footer her sayfada görünsün */
+        .header {
+            position: running(header);
+        }
+
+        .footer {
+            position: running(footer);
+        }
+
+        @page {
+            @top-center {
+                content: element(header);
+            }
+            @bottom-center {
+                content: element(footer);
+            }
+        }
+
+        /* Sayfa numaralandırması */
+        .page-number::after {
+            content: " / " counter(pages);
+        }
+
+        /* Teklif bilgileri tablosunun bölünmesini engelle */
+        .info-table {
+            page-break-inside: avoid;
+        }
+
+        /* Uzun içerikler için word-wrap */
+        .product-name,
+        .product-description {
+            word-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <table class="header-content">
+            <tr>
+                <td class="logo-section">
+                    <img src="/logo.png" alt="EasyTradeTR Logo" style="width: 120px; height: 40px; object-fit: contain;" />
+                </td>
+                <td class="company-info">
+                    <div class="company-name">EasyTradeTR</div>
+                    <div class="company-details">
+                        Adres: Maslak Mahallesi, Büyükdere Cad. No:255 Sarıyer/İstanbul<br>
+                        Tel: +90 212 456 78 90<br>
+                        E-posta: info@easytradetr.com
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div>Bu teklif 30 gün süreyle geçerlidir. | www.easytradetr.com | info@easytradetr.com | +90 212 456 78 90</div>
+    </div>
+
+    <!-- Sayfa Numarası -->
+    <div class="page-number"></div>
+
+    <!-- Ana İçerik -->
+    <div class="content">
+        <!-- Teklif Başlığı -->
+        <div class="quote-title">
+            <h1>FİYAT TEKLİFİ</h1>
+            <div class="quote-subtitle">Profesyonel Çözümler İçin Özel Teklif</div>
+        </div>
+
+        <!-- Teklif Bilgileri -->
+        <div class="quote-info">
+            <table class="info-table">
+                <tr class="info-row">
+                    <td class="info-label">Teklif No:</td>
+                    <td class="info-value">TKL-2024-001</td>
+                    <td class="info-label">Hazırlayan:</td>
+                    <td class="info-value">Ahmet Yılmaz</td>
+                </tr>
+                <tr class="info-row">
+                    <td class="info-label">Müşteri/Firma:</td>
+                    <td class="info-value">ABC Teknoloji Ltd. Şti.</td>
+                    <td class="info-label">Teklif Tarihi:</td>
+                    <td class="info-value">15.01.2024</td>
+                </tr>
+                <tr class="info-row">
+                    <td class="info-label">Teklif Başlığı:</td>
+                    <td class="info-value">Sunucu Donanım Teklifi</td>
+                    <td class="info-label">Geçerlilik:</td>
+                    <td class="info-value">14.02.2024</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Ürünler Bölümü -->
+        <div class="products-section">
+            <h2 class="section-title">Teklif Edilen Ürünler</h2>
+            
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Ürün Kodu</th>
+                        <th style="width: 40%;">Ürün Adı & Açıklama</th>
+                        <th style="width: 20%;">Birim Fiyat</th>
+                        <th style="width: 15%;">Miktar (Birim)</th>
+                        <th style="width: 20%;">Ara Toplam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="product-code">P12345</div>
+                        </td>
+                        <td>
+                            <div class="product-name">Dell PowerEdge R750</div>
+                            <div class="product-description">
+                                Intel Xeon Silver 4314, 32GB RAM, 2x480GB SSD, 
+                                RAID Controller, 3 Yıl Garanti
+                            </div>
+                        </td>
+                        <td class="price">45.000,00 ₺</td>
+                        <td class="quantity">2 Adet</td>
+                        <td class="subtotal">90.000,00 ₺</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-code">P67890</div>
+                        </td>
+                        <td>
+                            <div class="product-name">Cisco Catalyst 2960-X</div>
+                            <div class="product-description">
+                                24 Port Gigabit Switch, Layer 2, 
+                                PoE+ Destekli, Yönetilebilir
+                            </div>
+                        </td>
+                        <td class="price">8.500,00 ₺</td>
+                        <td class="quantity">1 Adet</td>
+                        <td class="subtotal">8.500,00 ₺</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-code">P11111</div>
+                        </td>
+                        <td>
+                            <div class="product-name">VMware vSphere Standard</div>
+                            <div class="product-description">
+                                Sanallaştırma Yazılımı, 
+                                1 CPU Lisansı, Teknik Destek Dahil
+                            </div>
+                        </td>
+                        <td class="price">12.000,00 ₺</td>
+                        <td class="quantity">2 Adet</td>
+                        <td class="subtotal">24.000,00 ₺</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-code">S99999</div>
+                        </td>
+                        <td>
+                            <div class="product-name">Kurulum ve Yapılandırma</div>
+                            <div class="product-description">
+                                Profesyonel kurulum, yapılandırma, 
+                                test ve devreye alma hizmeti
+                            </div>
+                        </td>
+                        <td class="price">5.000,00 ₺</td>
+                        <td class="quantity">1 Adet</td>
+                        <td class="subtotal">5.000,00 ₺</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Toplam Hesaplama -->
+            <div class="totals-section">
+                <table class="totals-table">
+                    <tr>
+                        <td class="totals-label">Ara Toplam:</td>
+                        <td class="totals-value">127.500,00 ₺</td>
+                    </tr>
+                    <tr>
+                        <td class="totals-label">KDV (%20):</td>
+                        <td class="totals-value">25.500,00 ₺</td>
+                    </tr>
+                    <tr>
+                        <td class="totals-label">İndirim:</td>
+                        <td class="totals-value">-3.000,00 ₺</td>
+                    </tr>
+                    <tr class="grand-total">
+                        <td class="totals-label">GENEL TOPLAM:</td>
+                        <td class="totals-value">150.000,00 ₺</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
